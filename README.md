@@ -14,6 +14,7 @@
 
 计划学习路线：
 
+- python: source: [https://inst.eecs.berkeley.edu/~cs61a/fa20/](https://inst.eecs.berkeley.edu/~cs61a/fa20/) repo: [https://git.acwing.com/hbin_frog/cs61a](https://git.acwing.com/hbin_frog/cs61a)
 - 算法: [https://www.acwing.com/activity/content/16/](https://www.acwing.com/activity/content/16/)
 - cs61c: [https://inst.eecs.berkeley.edu/~cs61c/fa20/](https://inst.eecs.berkeley.edu/~cs61c/fa20/)
 - cs144: [https://cs144.github.io](https://cs144.github.io)
