@@ -33,3 +33,9 @@
 
 > 主要任务：算法动态规划，体系结构入门，网络入门，cs61a
 
+1. 2022.11.08进度
+
+- cs61c开始汇编，lec7
+- cs144到1.2
+- 已经整理出动态规划的数字三角形模型，最长上升子序列模型，部分背包模型的题解[hbin_frooog](https://www.acwing.com/user/myspace/index/165868/)
+- cs61a学习到iterators

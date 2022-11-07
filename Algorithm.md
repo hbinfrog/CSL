@@ -577,7 +577,7 @@ int main()
   - 对于2：$f[i, j - 1]$表示的是第一个序列的前$i$个字母和第二个序列的前$j-1$个字母构成的所有公共子序列的集合；而2对应的是第一个序列的前$i$个字母和第二个序列的前$j$个字母构成的所有公共子序列的集合中A[i]一定出现，B[j]一定不出现的部分；$f[i, j - 1]$中A[i]是不一定存在的，所以说**$f[i, j - 1]$是包含2的；同理$f[i-1, j]$是包含3的**
   - 由于此题求的是$f[i, j]$的最大值，同时第一种情况是完全包含在$f[i, j - 1]$和$f[i - 1, j]$中的（如下图），即只需要对三种情况求最大值即可
 
-<img src="images/pic2.svg" alt="pic" style="zoom: 25%;" />
+<img src="images/pic.svg" alt="pic" style="zoom: 25%;" />
 
 时间复杂度：$O(n^2)$
 
@@ -776,7 +776,13 @@ int main()
 }
 ```
 
+#### 相似题目
 
+------
+
+[Acwing423 采药](https://www.acwing.com/problem/content/description/425/)
+
+[Acwing1024 装箱问题](https://www.acwing.com/problem/content/description/1026/)
 
 ### [Acwing3 完全背包问题](https://www.acwing.com/problem/content/3/)（每个背包可以无限用）
 
@@ -895,7 +901,7 @@ int main()
 }
 ```
 
-### [Acwing4 多重背包问题](https://www.acwing.com/problem/content/4/)（限制背包数量）
+### [Acwing4 多重背包问题I](https://www.acwing.com/problem/content/4/)（限制背包数量）
 
 ------
 
@@ -906,7 +912,7 @@ int main()
 - 有$N$件物品和一个容量是$V$的背包。每件物品最多有$s_i$可用。第$i$件物品的体积是$v_i$，价值是$w_i$。求解将哪些物品装入背包，可使这些物品的总体积不超过背包容量，且总价值最大。输出最大价值。
 - 输入格式：第一行两个整数$N, V$，用空格隔开，分别表示物品数量和背包容积。接下来有$N$行，每行三个整数$v_i, w_i, s_i$，用空格隔开，分别表示第$i$件物品的体积，价值和数量。
 - 输出格式：输出一个整数，表示最大价值。
-- 数据范围：$1 \le N, V \le 100, 0 \le v_i, w_i \le 100$
+- 数据范围：$1 \le N, V \le 100, 0 \le v_i, w_i, s_i \le 100$
 - 时空限制：1s/64MB
 
 #### 解题思路
@@ -939,6 +945,198 @@ int main()
             for(int k = 0; k <= min(s[i], j / v[i]); k++)
                 f[i][j] = max(f[i][j], f[i - 1][j - k * v[i]] + k * w[i]);
     cout << f[n][m] << endl;
+}
+```
+
+### [Acwing5 多重背包问题II](https://www.acwing.com/problem/content/5/)——数据增强版
+
+------
+
+#### 题目描述
+
+------
+
+其他部分与[Acwing4 多重背包问题](https://www.acwing.com/problem/content/4/)一样，唯一不同的是
+
+- 数据范围：$1 \le N \le 1000,1 \le V \le 2000 , 0 \le v_i, w_i,s_i \le 2000$
+
+#### 解题思路
+
+------
+
+因为暴力做法的时间复杂度为$O(n* m* s)$，必定会超时
+
+这里考虑将$s_i$进行分解，$s_i$二进制表示中最高的1的权重为$k$，则$0-s_i$中任何一个数都可以由$1, 2,... 2^k, s_i - 2^k$这些数组合相加而成，所以可以将$s_i$分为以上的若干个新的背包，每一个背包最多只能选一次，这就转换为[Acwing2 01背包问题](https://www.acwing.com/problem/content/2/)，通过上面的方法求解即可
+
+时间复杂度：$O(n*m*\log s)$
+
+#### 代码实现
+
+------
+
+```c++
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int N = 12000, M = 2010;
+int f[M], w[N], v[N];
+int n, m;
+
+int main()
+{
+    cin >> n >> m;
+    int cnt = 0;
+    for(int i = 1; i <= n; i++) {
+        int a, b, s;
+        cin >> a >> b >> s;
+        int k = 1;
+        while(k <= s) { // 分解: 1, 2, 4, 8, ... 2^k
+            cnt++;
+            w[cnt] = k * b;
+            v[cnt] = k * a;
+            s -= k;
+            k = k << 1;
+        }
+        if(s > 0) {  //剩余部分: s - 2^k
+            cnt++;
+            w[cnt] = s * b;
+            v[cnt] = s * a;
+        }
+    }
+    for(int i = 1; i <= cnt; i++)
+        for(int j = m; j >= v[i]; j--)
+            f[j] = max(f[j], f[j - v[i]] + w[i]); // 01背包问题
+    cout << f[m] << endl;
+    
+    
+}
+```
+
+### [Acwing9 分组背包问题](https://www.acwing.com/problem/content/description/9/)
+
+------
+
+#### 题目描述
+
+------
+
+- 有$N$组物品和一个容量是$V$的背包。每组物品有若干个，同一组内的物品最多只能选一个。每件物品的体积是$v_{ij}$，价值是$w_{ij}$，其中$i$是组号，$j$是组内编号。求解将哪些物品装入背包，可使物品总体积不超过背包容量，且总价值最大。输出最大价值。
+- 输入格式：第一行两个整数$N, V$，用空格隔开，分别表示物品数量和背包容积。接下来有$N$组数据：每组数据第一行有一个整数$s_i$，表示第$i$个物品组的物品数量；每组数据接下来有$s_i$行，每行有两个整数$v_{ij}, w_{ij}$，用空格隔开，分别表示第$i$个物品组的第$j$个物品的体积和价值；
+- 输出格式：输出一个整数，表示最大价值。
+- 数据范围：$1 \le N, V \le 100, 0 \lt s_i \le 100, 0 \le v_i, w_i \le 100$
+- 时空限制：1s/64MB
+
+#### 解题思路
+
+------
+
+考虑状态$f[i, j]$：
+
+- 集合：在前$i$组中选，且体积不超过$j$的所有方案的集合
+
+- 属性：集合中的方案的价值最大值
+
+- 计算：可以依据第$i$组的选择来划分集合：选0个，选第1个，选第2个……选第$s_i$个
+
+  $f[i, j] = \max(f[i-1,j], f[i - 1, j - v[i, 0]] + w[i, 0], ... f[i - 1, j - v[i, s[i] - 1]] + w[i, s[i] - 1] )$
+
+时间复杂度：$O(n * m * s)$
+
+#### 代码实现
+
+------
+
+```c++
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int N = 105;
+int f[N][N], w[N][N], v[N][N], s[N];
+int n, m;
+
+int main() {
+    cin >> n >> m;
+    for(int i = 1; i <= n; i++) {
+        cin >> s[i];
+        for(int j = 0; j < s[i]; j++)
+            cin >> v[i][j] >> w[i][j];
+    }
+    for(int i = 1; i <= n; i++)
+        for(int j = 0; j <= m; j++) {
+            f[i][j] = f[i - 1][j]; // 不选
+            for(int k = 0; k < s[i]; k++)  // k对应着选第0～s_i个
+                if(j >= v[i][k]) f[i][j] = max(f[i][j], f[i - 1][j - v[i][k]] + w[i][k]);
+        }
+    cout << f[n][m] << endl;
+}
+```
+
+### [Acwing7 混合背包问题](https://www.acwing.com/problem/content/description/7/)
+
+------
+
+#### 题目描述
+
+------
+
+- 有$N$种物品和一个容量是$V$的背包。物品一共有三类：第一类物品只能用1次（01背包）；第二类物品可以用无限次（完全背包）；第三类物品最多只能用$s_i$次（多重背包）；每种体积是$v_i$，价值是$w_i$​。求解将哪些物品装入背包，可使物品体积总和不超过背包容量，且价值总和最大。输出最大价值。
+- 输入格式：第一行两个整数$N, V$，用空格隔开，分别表示物品数量和背包容积。接下来有$N$行，每行三个整数$v_i, w_i, s_i$，用空格隔开，分别表示第$i$种物品的体积、价值和数量。$s_i = -1$表示只能用一次，$s_i = 0$表示可以使用无限次，$s_i > 0$表示可以使用$s_i$次
+- 输出格式：输出一个整数，表示最大价值。
+- 数据范围：$1 \le N, V \le 1000, -1 \le s_i \le 1000, 0 \le v_i, w_i \le 1000$
+- 时空限制：1s/64MB
+
+#### 解题思路
+
+------
+
+考虑状态$f[i, j]$：
+
+- 集合：只从前$i$件物品中选，且总体积不超过$j$的所有方案的集合
+- 属性：集合中的方案的价值最大值
+- 计算：因为状态转移只取决于第$i$件物品的属性，与前$i-1$件物品的属性无关，所以只需要根据第$i$件物品的属性进行相应的计算即可。需要注意的是，对于多重背包问题，这里需要使用[Acwing5 多重背包问题II](https://www.acwing.com/problem/content/5/)，防止时间超时
+
+时间复杂度：$O(n * m * \log s)$
+
+#### 代码实现
+
+------
+
+```c++
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+
+using namespace std;
+const int N = 1010;
+int f[N];
+int n, m;
+
+int main()
+{
+    cin >> n >> m;
+    for(int i = 0; i < n; i++) {
+        int v, w, s;
+        cin >> v >> w >> s;
+        if(s == 0) {
+            for(int j = v; j <= m; j++)
+                f[j] = max(f[j], f[j - v] + w); // 完全背包问题
+        }
+        else {
+            if(s == -1) s = 1; // 01转换为数量为1的多重背包
+            for(int k = 1; k <= s; k = k << 1) { // 二进制转换
+                for(int j = m; j >= k * v; j--) 
+                    f[j] = max(f[j], f[j - k * v] + k * w); // 转换之后做01背包
+                s -= k;
+            }
+            if(s) {
+                for(int j = m; j >= s * v; j--) 
+                    f[j] = max(f[j], f[j - s * v] + s * w); // 剩余部分的01背包
+            }
+        }
+    }
+    cout << f[m] << endl;
 }
 ```
 
